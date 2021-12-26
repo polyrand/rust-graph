@@ -127,6 +127,18 @@ impl Graph {
 
                 let removed_node = self.nodes.swap_remove(node_idx);
 
+                /*
+                Here I'm iterating twice over the vector, 1st to .retain()
+                valid edges, and 2nd to modify the edges pointing to the moved
+                node. There's a nightly-only feature that would enable doing this
+                in a single pass:
+                - https://doc.rust-lang.org/std/vec/struct.Vec.html#method.drain_filter
+                There's a crate to do retain_mut:
+                - https://github.com/upsuper/retain_mut
+                The function introduced in this PR could also be used:
+                - https://github.com/RoaringBitmap/roaring-rs/pull/85
+                */
+
                 // remove all edges pointing to the removed node
                 self.edges
                     .retain(|x| x.from != node_idx && x.to != node_idx);
