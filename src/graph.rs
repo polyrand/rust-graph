@@ -3,7 +3,6 @@
 use core::panic;
 use std::collections::{HashSet, VecDeque};
 use std::convert::From;
-// use std::sync::RwLock;
 
 type NodeIndex = usize;
 type EdgeIndex = usize;
@@ -14,15 +13,15 @@ type Path = Vec<PathStep>;
 // type NodeData = String;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
-enum DataTypes {
+pub enum DataTypes {
     Text(String),
     Blob(Vec<u8>),
     Integer(isize),
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
-struct Node {
-    data: DataTypes,
+pub struct Node {
+    pub data: DataTypes,
 }
 
 impl From<&str> for Node {
@@ -67,26 +66,26 @@ impl Node {
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
-struct Edge {
-    from: usize,
-    to: usize,
+pub struct Edge {
+    pub from: NodeIndex,
+    pub to: NodeIndex,
 }
 
 #[derive(Debug)]
-struct Graph {
+pub struct Graph {
     nodes: Vec<Node>,
     edges: Vec<Edge>,
 }
 
 impl Graph {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Graph {
             nodes: Vec::new(),
             edges: Vec::new(),
         }
     }
 
-    fn add_node(&mut self, new_node: Node) -> NodeIndex {
+    pub fn add_node(&mut self, new_node: Node) -> NodeIndex {
         for (idx, node) in self.nodes.iter().enumerate() {
             if node == &new_node {
                 return idx;
@@ -97,7 +96,7 @@ impl Graph {
         self.nodes.len() - 1
     }
 
-    fn add_edge(&mut self, new_edge: Edge) -> EdgeIndex {
+    pub fn add_edge(&mut self, new_edge: Edge) -> EdgeIndex {
         for (idx, edge) in self.edges.iter().enumerate() {
             if edge == &new_edge {
                 return idx;
@@ -108,7 +107,7 @@ impl Graph {
         self.edges.len() - 1
     }
 
-    fn find_node_idx(&self, node: Node) -> Option<NodeIndex> {
+    pub fn find_node_idx(&self, node: Node) -> Option<NodeIndex> {
         for (idx, current_node) in self.nodes.iter().enumerate() {
             if current_node == &node {
                 return Some(idx);
@@ -118,7 +117,7 @@ impl Graph {
         None
     }
 
-    fn remove_node(&mut self, node_idx: NodeIndex) -> Option<Node> {
+    pub fn remove_node(&mut self, node_idx: NodeIndex) -> Option<Node> {
         match self.nodes.get(node_idx) {
             None => None,
             Some(_) => {
@@ -152,7 +151,7 @@ impl Graph {
         }
     }
 
-    fn reachable_nodes_from(&self, node_idx: NodeIndex) -> Vec<NodeIndex> {
+    pub fn reachable_nodes_from(&self, node_idx: NodeIndex) -> Vec<NodeIndex> {
         self.edges
             .iter()
             .filter(|e| e.from == node_idx)
@@ -160,7 +159,7 @@ impl Graph {
             .collect()
     }
 
-    fn nodes_that_can_reach(&self, node_idx: NodeIndex) -> Vec<NodeIndex> {
+    pub fn nodes_that_can_reach(&self, node_idx: NodeIndex) -> Vec<NodeIndex> {
         self.edges
             .iter()
             .filter(|e| e.to == node_idx)
@@ -168,7 +167,30 @@ impl Graph {
             .collect()
     }
 
-    fn bfs_distance(&self, start: NodeIndex, end: NodeIndex) -> usize {
+    pub fn boundary(&self) -> Option<Vec<NodeIndex>> {
+        // find all nodes that do NOT have a "from" edge, that is:
+        // other nodes may reach it but it doesn't reach any, thus making it
+        // a "boundary" node.
+
+        let froms: HashSet<usize> = self.edges.iter().map(|e| e.from).collect();
+
+        let b: Vec<NodeIndex> = (0..self.nodes.len())
+            .filter(|node_idx| !froms.contains(node_idx))
+            .collect();
+
+        if b.is_empty() {
+            None
+        } else {
+            Some(b)
+        }
+    }
+
+    // Alias function for tree structures
+    pub fn leaves(&self) -> Option<Vec<NodeIndex>> {
+        self.boundary()
+    }
+
+    pub fn bfs_distance(&self, start: NodeIndex, end: NodeIndex) -> usize {
         if start == end {
             return 0;
         }
@@ -202,29 +224,6 @@ impl Graph {
         distance
     }
 
-    fn boundary(&self) -> Option<Vec<NodeIndex>> {
-        // find all nodes that do NOT have a "from" edge, that is:
-        // other nodes may reach it but it doesn't reach any, thus making it
-        // a "boundary" node.
-
-        let froms: HashSet<usize> = self.edges.iter().map(|e| e.from).collect();
-
-        let b: Vec<NodeIndex> = (0..self.nodes.len())
-            .filter(|node_idx| !froms.contains(node_idx))
-            .collect();
-
-        if b.is_empty() {
-            None
-        } else {
-            Some(b)
-        }
-    }
-
-    // Alias function for tree structures
-    fn leaves(&self) -> Option<Vec<NodeIndex>> {
-        self.boundary()
-    }
-
     /*
 
     Note: the original graph (&self) node indexes will be wrapped as new nodes
@@ -252,7 +251,7 @@ impl Graph {
           in the `path_tree` nodes.
         path: [just_found_idx, current_exploration_node, ...
     */
-    fn shortest_path(&self, start: NodeIndex, end: NodeIndex) -> Option<Vec<NodeIndex>> {
+    pub fn shortest_path(&self, start: NodeIndex, end: NodeIndex) -> Option<Vec<NodeIndex>> {
         let mut visited_graph: HashSet<NodeIndex> = HashSet::new();
         visited_graph.insert(start);
 
@@ -347,92 +346,8 @@ impl Graph {
     }
 }
 
-/*
-                            ┌──────┐
-                            │      │
-                    ┌─────► │  N2  │
-                    │       │      │
-                    │       └──────┘
-                    │
-                    │
-                ┌───┴──┐
-    ┌───────────┤      │
-    │           │  N0  │           ┌──────┐
-    ▼           │      ├─────────► │      │
- ┌──────┐       └────┬─┘           │  N3  │
- │      │            │             │      │
- │  N1  │            │             └───┬──┘
- │      │            │                 │
- └──────┘            │                 │
-                     ▼                 │
-                   ┌──────┐            ▼
-                   │      │         ┌──────┐
-                   │  N4  │         │      │
-                   │      │ ───────►│  N5  │
-                   └──────┘         │      │
-                                    └──────┘
-*/
-
-fn main() {
-    let mut g2 = Graph::new();
-
-    g2.add_node(Node::from(1));
-    println!("Single node b {:?}", g2.boundary());
-
-    let mut g = Graph::new();
-
-    let idx0 = g.add_node(Node::from("hello"));
-    let idx1 = g.add_node(Node::from("world"));
-    let idx2 = g.add_node(Node::from("foo"));
-    let idx3 = g.add_node(Node::from("bar"));
-    let idx4 = g.add_node(Node::from("baz"));
-    let idx5 = g.add_node(Node::from("asd"));
-
-    println!("Reachable {:?}", g.reachable_nodes_from(idx2));
-
-    g.add_edge(Edge {
-        from: idx0,
-        to: idx1,
-    });
-    g.add_edge(Edge {
-        from: idx0,
-        to: idx2,
-    });
-    g.add_edge(Edge {
-        from: idx0,
-        to: idx3,
-    });
-    g.add_edge(Edge {
-        from: idx0,
-        to: idx4,
-    });
-
-    g.add_edge(Edge {
-        from: idx3,
-        to: idx5,
-    });
-    g.add_edge(Edge {
-        from: idx4,
-        to: idx5,
-    });
-
-    // println!("{:#?}", g);
-    println!("Boundary: {:?}", g.boundary().unwrap());
-
-    println!("Bfs {}", g.bfs_distance(0, 5));
-    println!("Shortest path {:?}", g.shortest_path(0, 5));
-    println!("Shortest path {:?}", g.shortest_path(2, 5));
-    println!("Shortest path {:?}", g.shortest_path(3, 5));
-
-    println!("==============");
-    println!("Removing");
-
-    let rm = g.remove_node(idx3).unwrap();
-
-    println!("Removed node: {:#?}", rm);
-
-    println!("{:?}", g);
-
-    println!("{:?}", g.reachable_nodes_from(0));
-    println!("{:?}", g.nodes_that_can_reach(1));
+impl Default for Graph {
+    fn default() -> Self {
+        Self::new()
+    }
 }
