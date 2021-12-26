@@ -1,57 +1,8 @@
 [package]
-name = "graphs"
+name = "rust-graph"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# lazy_static = "1.4.0"
-# tempfile = "3.2.0"
-# itertools = "0.10.3"
-# rusqlite = { version = "0.26.3", features = [
-#     "load_extension",
-#     "backup",
-#     "functions",
-#     "window",
-#     "trace",
-#     "blob",
-#     "limits",
-#     "serde_json",
-#     "bundled",
-#     "vtab",
-#     "series",
-#     "i128_blob",
-#     "uuid",
-#     "column_decltype",
-#     "collation",
-# ] }
-
-
-# "load_extension",
-# "backup",
-# "functions",
-# "window",
-# "trace",
-# "blob",
-# "limits",
-# "chrono",
-# "serde_json",
-# "time",
-# "url",
-# "bundled",
-# "sqlcipher",
-# "bundled-sqlcipher",
-# "bundled-sqlcipher-vendored-openssl",
-# "hooks",
-# "unlock_notify",
-# "vtab",
-# "series",
-# "csvtab,",
-# "array,",
-# "i128_blob",
-# "uuid",
-# "session,",
-# "extra_check",
-# "column_decltype",
-# "collation",
