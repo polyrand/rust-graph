@@ -5,6 +5,7 @@ pub use crate::graph::Graph;
 pub use crate::graph::Node;
 
 /*
+https://asciiflow.com/#/share/eJyrVspLzE1VssorzcnRUcpJrEwtUrJSqo5RqohRsrK0MNOJUaoEsowsLICsktSKEiAnRkkBN3g0pefRlAYMNCEmJg%2BvriY4A7vKR1P2oKNpuyD6%2FIzw6yPFDjhrCjZfzMCpjwQJLD5BCiFsslgQmvkIl8P94WeAKYwvah5NwzACl2uxxAEiXPG7GKd5KHaDItUYyUD06MHGxeIOoCmGRGjDGdXE2gwVI%2Bx5AroxhBXQowW%2FaqJsn4ZTL6bzYGmzAYmBMzNDAtwEwwQYA3umQ7EXVxqDGG2K1xRskUiCO4g1ckaMUq1SLQD7%2FQPc)
                             ┌──────┐
                             │      │
                     ┌─────► │  N2  │
